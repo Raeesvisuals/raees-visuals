@@ -15,6 +15,28 @@ const clamp = (v: number, min: number = 0, max: number = 100) => Math.min(Math.m
 const round = (v: number, precision: number = 3) => parseFloat(v.toFixed(precision));
 const adjust = (v: number, fMin: number, fMax: number, tMin: number, tMax: number) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
 
+interface ProfileCardProps {
+  avatarUrl: any;
+  iconUrl?: string;
+  grainUrl?: string;
+  innerGradient: any;
+  behindGlowEnabled?: boolean;
+  behindGlowColor: any;
+  behindGlowSize: any;
+  className?: string;
+  enableTilt?: boolean;
+  enableMobileTilt?: boolean;
+  mobileTiltSensitivity?: number;
+  miniAvatarUrl?: any;
+  name?: string;
+  title?: string;
+  handle?: string;
+  status?: string;
+  contactText?: string;
+  showUserInfo?: boolean;
+  onContactClick?: () => void;
+}
+
 const ProfileCardComponent = ({
   avatarUrl,
   iconUrl = '',
@@ -35,7 +57,7 @@ const ProfileCardComponent = ({
   contactText = 'Contact',
   showUserInfo = true,
   onContactClick
-}) => {
+}: ProfileCardProps) => {
   const wrapRef = useRef(null);
   const shellRef = useRef(null);
 
