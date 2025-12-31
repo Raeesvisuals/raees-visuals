@@ -58,11 +58,11 @@ const ProfileCardComponent = ({
   showUserInfo = true,
   onContactClick
 }: ProfileCardProps) => {
-  const wrapRef = useRef(null);
-  const shellRef = useRef(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
 
-  const enterTimerRef = useRef(null);
-  const leaveRafRef = useRef(null);
+  const enterTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const leaveRafRef = useRef<number | null>(null);
 
   const tiltEngine = useMemo(() => {
     if (!enableTilt) return null;
