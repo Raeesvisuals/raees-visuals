@@ -11,9 +11,9 @@ const ANIMATION_CONFIG = {
   ENTER_TRANSITION_MS: 180
 };
 
-const clamp = (v, min = 0, max = 100) => Math.min(Math.max(v, min), max);
-const round = (v, precision = 3) => parseFloat(v.toFixed(precision));
-const adjust = (v, fMin, fMax, tMin, tMax) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
+const clamp = (v: number, min: number = 0, max: number = 100) => Math.min(Math.max(v, min), max);
+const round = (v: number, precision: number = 3) => parseFloat(v.toFixed(precision));
+const adjust = (v: number, fMin: number, fMax: number, tMin: number, tMax: number) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
 
 const ProfileCardComponent = ({
   avatarUrl,
