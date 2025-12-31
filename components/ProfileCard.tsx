@@ -184,7 +184,7 @@ const ProfileCardComponent = ({
   };
 
   const handlePointerMove = useCallback(
-    event => {
+    (event: PointerEvent) => {
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
       const { x, y } = getOffsets(event, shell);
@@ -194,7 +194,7 @@ const ProfileCardComponent = ({
   );
 
   const handlePointerEnter = useCallback(
-    event => {
+    (event: PointerEvent) => {
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
 
@@ -232,7 +232,7 @@ const ProfileCardComponent = ({
   }, [tiltEngine]);
 
   const handleDeviceOrientation = useCallback(
-    event => {
+    (event: DeviceOrientationEvent) => {
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
 
