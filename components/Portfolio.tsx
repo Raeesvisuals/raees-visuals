@@ -219,7 +219,7 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
           videoSrc={selectedVideo.url}
           format={selectedVideo.format}
           isYouTube={isYouTubeUrl(selectedVideo.url)}
-          youtubeId={isYouTubeUrl(selectedVideo.url) ? getYouTubeId(selectedVideo.url) : undefined}
+          youtubeId={isYouTubeUrl(selectedVideo.url) ? getYouTubeId(selectedVideo.url) || undefined : undefined}
         />
       )}
     </section>
