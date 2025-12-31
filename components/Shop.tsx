@@ -237,7 +237,7 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
         productId: product._id,
         productTitle: product.title,
         productThumbnail: thumbnailUrl,
-        downloadUrl: product.downloadUrl,
+        downloadUrl: product.downloadUrl || product.downloadFile?.filePath || '',
         purchaseDate: new Date().toISOString(),
         amount: product.price,
         status: 'completed'
