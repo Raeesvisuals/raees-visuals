@@ -145,12 +145,12 @@ const ProfileCardComponent = ({
     };
 
     return {
-      setImmediate(x, y) {
+      setImmediate(x: number, y: number) {
         currentX = x;
         currentY = y;
         setVarsFromXY(currentX, currentY);
       },
-      setTarget(x, y) {
+      setTarget(x: number, y: number) {
         targetX = x;
         targetY = y;
         start();
@@ -160,7 +160,7 @@ const ProfileCardComponent = ({
         if (!shell) return;
         this.setTarget(shell.clientWidth / 2, shell.clientHeight / 2);
       },
-      beginInitial(durationMs) {
+      beginInitial(durationMs: number) {
         initialUntil = performance.now() + durationMs;
         start();
       },
