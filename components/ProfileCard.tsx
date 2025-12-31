@@ -346,8 +346,8 @@ const ProfileCardComponent = ({
                   crossOrigin="anonymous"
                   onError={e => {
                     console.error('❌ Failed to load ProfileCard avatar:', avatarUrl);
-                    const t = e.target;
-                    t.style.display = 'none';
+                    const t = e.target as HTMLImageElement;
+                    if (t) t.style.display = 'none';
                   }}
                   onLoad={() => {
                     console.log('✅ ProfileCard avatar loaded successfully');
@@ -365,9 +365,11 @@ const ProfileCardComponent = ({
                           loading="eager"
                           crossOrigin="anonymous"
                           onError={e => {
-                            const t = e.target;
-                            t.style.opacity = '0.5';
-                            t.src = avatarUrl;
+                            const t = e.target as HTMLImageElement;
+                            if (t) {
+                              t.style.opacity = '0.5';
+                              t.src = avatarUrl;
+                            }
                           }}
                         />
                       </div>
