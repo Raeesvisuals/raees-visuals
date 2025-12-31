@@ -199,6 +199,10 @@ const AboutSection: React.FC = () => {
             status={profile?.status || "Available for Projects"}
             contactText="Contact"
             avatarUrl={avatarUrl}
+            innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
+            behindGlowColor="rgba(125, 190, 255, 0.67)"
+            behindGlowSize="50%"
+            miniAvatarUrl={avatarUrl}
             showUserInfo
             enableTilt
             enableMobileTilt={false}
