@@ -320,7 +320,7 @@ const ProfileCardComponent = ({
       '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
       '--behind-glow-color': behindGlowColor ?? 'rgba(125, 190, 255, 0.67)',
       '--behind-glow-size': behindGlowSize ?? '50%'
-    }),
+    } as React.CSSProperties),
     [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize]
   );
 
