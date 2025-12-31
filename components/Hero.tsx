@@ -16,6 +16,12 @@ export default function Hero() {
   useEffect(() => {
     async function fetchHeroData() {
       try {
+        console.log("🔍 Hero: Fetching data from Sanity...");
+        console.log("📋 Sanity config:", {
+          projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+          dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+        });
+        
         const result = await sanityClient.fetch<HomeHero>(
           `*[_type == "home"][0]{
             heroTitle,
@@ -23,9 +29,15 @@ export default function Hero() {
             heroDescription
           }`
         );
+        
+        console.log("✅ Hero: Data fetched:", result);
         setData(result || null);
+        
+        if (!result) {
+          console.warn("⚠️ Hero: No data found in Sanity. Make sure you have a 'home' document in your Sanity Studio.");
+        }
       } catch (error) {
-        console.error("Error fetching hero data:", error);
+        console.error("❌ Hero: Error fetching data:", error);
         setData(null);
       }
     }
