@@ -67,20 +67,20 @@ const ProfileCardComponent = ({
   const tiltEngine = useMemo(() => {
     if (!enableTilt) return null;
 
-    let rafId = null;
-    let running = false;
-    let lastTs = 0;
+    let rafId: number | null = null;
+    let running: boolean = false;
+    let lastTs: number = 0;
 
-    let currentX = 0;
-    let currentY = 0;
-    let targetX = 0;
-    let targetY = 0;
+    let currentX: number = 0;
+    let currentY: number = 0;
+    let targetX: number = 0;
+    let targetY: number = 0;
 
     const DEFAULT_TAU = 0.14;
     const INITIAL_TAU = 0.6;
-    let initialUntil = 0;
+    let initialUntil: number = 0;
 
-    const setVarsFromXY = (x, y) => {
+    const setVarsFromXY = (x: number, y: number) => {
       const shell = shellRef.current;
       const wrap = wrapRef.current;
       if (!shell || !wrap) return;
@@ -109,7 +109,7 @@ const ProfileCardComponent = ({
       for (const [k, v] of Object.entries(properties)) wrap.style.setProperty(k, v);
     };
 
-    const step = ts => {
+    const step = (ts: number) => {
       if (!running) return;
       if (lastTs === 0) lastTs = ts;
       const dt = (ts - lastTs) / 1000;
@@ -176,9 +176,11 @@ const ProfileCardComponent = ({
     };
   }, [enableTilt]);
 
-  const getOffsets = (evt, el) => {
+  const getOffsets = (evt: MouseEvent | TouchEvent, el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
-    return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+    const clientX = 'touches' in evt ? evt.touches[0].clientX : evt.clientX;
+    const clientY = 'touches' in evt ? evt.touches[0].clientY : evt.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
   };
 
   const handlePointerMove = useCallback(
