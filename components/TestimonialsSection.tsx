@@ -138,7 +138,7 @@ const TestimonialsSection: React.FC = () => {
               <motion.div
                 className="flex gap-6"
                 animate={{
-                  x: `calc(-${currentIndex * 100}% - ${currentIndex * 1.5}rem)`
+                  x: `calc(-${currentIndex * (100 / 3)}% - ${currentIndex * 1.5}rem)`
                 }}
                 transition={{
                   type: "spring",
@@ -147,7 +147,10 @@ const TestimonialsSection: React.FC = () => {
                   mass: 0.8
                 }}
                 drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
+                dragConstraints={{ 
+                  left: `calc(-${(testimonials.length - 3) * (100 / 3)}% - ${(testimonials.length - 3) * 1.5}rem)`,
+                  right: 0
+                }}
                 dragElastic={0.2}
                 onDragEnd={(e, { offset, velocity }) => {
                   const swipe = Math.abs(offset.x) * Math.sign(offset.x);
@@ -156,7 +159,7 @@ const TestimonialsSection: React.FC = () => {
                   if (Math.abs(swipe) > swipeThreshold || Math.abs(velocity.x) > 500) {
                     if (swipe > 0 && currentIndex > 0) {
                       paginate(-1);
-                    } else if (swipe < 0 && currentIndex < testimonials.length - 1) {
+                    } else if (swipe < 0 && currentIndex < Math.max(0, testimonials.length - 3)) {
                       paginate(1);
                     }
                   }
@@ -171,33 +174,15 @@ const TestimonialsSection: React.FC = () => {
                         .url()
                     : null;
 
-                  // Calculate which cards to show (current, prev, next)
-                  const isCurrent = index === currentIndex;
-                  const isPrev = index === (currentIndex - 1 + testimonials.length) % testimonials.length;
-                  const isNext = index === (currentIndex + 1) % testimonials.length;
-                  const shouldShow = isCurrent || isPrev || isNext;
-
-                  if (!shouldShow && testimonials.length > 3) return null;
-
                   return (
                     <motion.div
                       key={testimonial._id}
-                      className="flex-shrink-0 w-full md:w-1/3 px-2"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ 
-                        opacity: isCurrent ? 1 : 0.7,
-                        scale: isCurrent ? 1 : 0.95
-                      }}
-                      transition={{ duration: 0.3 }}
+                      className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
                     >
-                      <div className={`
-                        bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8 h-full
-                        transition-all duration-300
-                        ${isCurrent 
-                          ? 'border-primary/30 shadow-lg shadow-primary/10' 
-                          : 'border-text-primary/10'
-                        }
-                      `}>
+                      <div className="bg-dark-lighter/50 backdrop-blur-md border border-text-primary/10 rounded-2xl p-6 md:p-8 h-full hover:border-primary/30 transition-all duration-300">
                         {/* Stars */}
                         <div className="flex gap-1 mb-4">
                           {[...Array(testimonial.rating || 5)].map((_, i) => (
