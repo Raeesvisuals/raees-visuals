@@ -233,7 +233,6 @@ const TestimonialsSection: React.FC = () => {
                   );
                 })}
               </motion.div>
-            </div>
 
               {/* Navigation Arrows */}
               {testimonials.length > 1 && (
