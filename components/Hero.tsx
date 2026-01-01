@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { sanityClient } from "@/lib/sanity";
-import Aurora from "./Aurora";
 
 type HomeHero = {
   heroTitle?: string;
@@ -53,13 +52,7 @@ export default function Hero() {
 
   return (
     <section className="relative h-[50vh] min-h-[420px] bg-[#060010] flex items-center justify-center">
-      <div className="absolute inset-0" style={{ width: '100%', height: '100%', position: 'relative' }}>
-        <Aurora
-          colorStops={["#39209d", "#2f1499", "#261371"]}
-          amplitude={0.3}
-          blend={1}
-        />
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-black to-black" />
 
       <div className="relative w-[86%] h-[60%] border-2 border-primary rounded-2xl flex items-center justify-center p-8">
         <motion.div

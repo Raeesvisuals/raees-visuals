@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Aurora from "./Aurora";
 
 interface FormData {
   name: string;
@@ -104,12 +103,8 @@ const ContactForm: React.FC = () => {
       className="relative py-20 px-4 overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
-        <Aurora
-          colorStops={["#39209d", "#2f1499", "#261371"]}
-          amplitude={0.3}
-          blend={1}
-        />
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
       
       {/* Background Effects */}

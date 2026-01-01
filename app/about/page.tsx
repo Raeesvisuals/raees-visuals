@@ -6,7 +6,6 @@ import Image from 'next/image';
 import ProfileCard from '@/components/ProfileCard';
 import { FaEdit, FaPalette, FaVideo, FaMagic, FaCogs } from 'react-icons/fa';
 import { sanityClient, urlFor } from '@/lib/sanity';
-import Aurora from '@/components/Aurora';
 
 type AboutProfile = {
   name?: string;
@@ -200,12 +199,8 @@ export default function About() {
     <div className="min-h-[calc(100vh-8rem)]">
       <section ref={sectionRef} className="relative min-h-screen py-20 px-4 overflow-hidden bg-dark">
       {/* Background */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
-        <Aurora
-          colorStops={["#39209d", "#2f1499", "#261371"]}
-          amplitude={0.3}
-          blend={1}
-        />
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
       
       {/* Glassmorphic Background */}
