@@ -79,8 +79,7 @@ export default function LiquidEther({
     }
 
     try {
-
-    function makePaletteTexture(stops: string[]) {
+    const makePaletteTexture = (stops: string[]) => {
       let arr;
       if (Array.isArray(stops) && stops.length > 0) {
         if (stops.length === 1) {
@@ -108,7 +107,7 @@ export default function LiquidEther({
       tex.generateMipmaps = false;
       tex.needsUpdate = true;
       return tex;
-    }
+    };
 
     const paletteTex = makePaletteTexture(colors);
     const bgVec4 = new THREE.Vector4(0, 0, 0, 0); // always transparent
