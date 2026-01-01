@@ -137,6 +137,7 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
             className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6"
             style={{
               gridAutoFlow: 'dense',
+              gridAutoRows: 'min-content',
             }}
           >
             {displayed.map((item) => {
@@ -149,7 +150,7 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
                 <motion.div
                   key={item._id}
                   layout
-                  className={`${isShort ? "col-span-1" : "col-span-1 sm:col-span-1 md:col-span-1 lg:col-span-1"}`}
+                  className="col-span-1"
                   style={{
                     gridRow: isShort ? 'span 2' : 'span 1',
                   }}
