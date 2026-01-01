@@ -8,6 +8,7 @@ import Link from "next/link";
 import { sanityClient, urlFor } from "@/lib/sanity";
 import ElectricBorder from "@/components/ElectricBorder";
 import PaymentModal from "@/components/PaymentModal";
+import Aurora from "@/components/Aurora";
 import DownloadButton from "@/components/DownloadButton";
 import VideoModal from "@/components/VideoModal";
 import {
@@ -178,8 +179,12 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-dark relative">
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+      <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Aurora
+          colorStops={["#39209d", "#2f1499", "#261371"]}
+          amplitude={0.3}
+          blend={1}
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-20">

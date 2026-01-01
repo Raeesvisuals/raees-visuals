@@ -8,6 +8,7 @@ import { FaPlay } from "react-icons/fa";
 import VideoModal from "./VideoModal";
 import { getPortfolioItems } from "@/lib/portfolio";
 import { urlFor } from "@/lib/sanity";
+import Aurora from "./Aurora";
 
 interface PortfolioProps {
   isHomepage?: boolean;
@@ -100,8 +101,12 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
 
   return (
     <section ref={sectionRef} id="portfolio" className="relative py-20 px-4">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+      <div className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Aurora
+          colorStops={["#39209d", "#2f1499", "#261371"]}
+          amplitude={0.3}
+          blend={1}
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { getUserPurchases, setCurrentUser, currentUser, mockUsers } from "@/data/user";
 import { shopProducts } from "@/data/shop";
 import { FaDownload, FaArrowLeft, FaUser, FaShoppingBag, FaSignInAlt } from "react-icons/fa";
+import Aurora from "@/components/Aurora";
 
 export default function AccountPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!currentUser);
@@ -39,8 +40,12 @@ export default function AccountPage() {
     return (
       <div className="min-h-screen bg-dark">
         {/* Background */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+        <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
+          <Aurora
+            colorStops={["#39209d", "#2f1499", "#261371"]}
+            amplitude={0.3}
+            blend={1}
+          />
         </div>
         
         <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-lighter/20 to-dark pointer-events-none" />
@@ -125,8 +130,12 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-dark">
       {/* Background */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+      <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Aurora
+          colorStops={["#39209d", "#2f1499", "#261371"]}
+          amplitude={0.3}
+          blend={1}
+        />
       </div>
       
       <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-lighter/20 to-dark pointer-events-none" />

@@ -6,6 +6,7 @@ import Image from "next/image";
 import ProfileCard from "./ProfileCard";
 import { FaEdit, FaPalette, FaVideo, FaMagic, FaCogs } from "react-icons/fa";
 import { sanityClient, urlFor } from "@/lib/sanity";
+import Aurora from "./Aurora";
 
 type HomeAboutProfile = {
   name?: string;
@@ -171,8 +172,12 @@ const AboutSection: React.FC = () => {
       id="about"
       className="relative py-20 px-4 overflow-hidden"
     >
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+      <div className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Aurora
+          colorStops={["#39209d", "#2f1499", "#261371"]}
+          amplitude={0.3}
+          blend={1}
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
