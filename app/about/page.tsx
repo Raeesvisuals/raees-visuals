@@ -145,6 +145,7 @@ export default function About() {
           softwareCount: result?.software?.length || 0,
           servicesCount: result?.services?.length || 0,
           teamCount: result?.team?.length || 0,
+          teamData: result?.team,
         });
         setAboutData(result || null);
       } catch (error) {
@@ -359,11 +360,11 @@ export default function About() {
         </div>
 
         {/* Team Members Section */}
-        {team && team.length > 0 && (
+        {team && team.length > 0 ? (
           <motion.div
-            className="mt-20"
+            className="mt-20 relative z-10"
             initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <h3 className="text-3xl font-bold text-text-primary text-center mb-12">
@@ -392,7 +393,7 @@ export default function About() {
                     key={`${member.name}-${index}`}
                     className="bg-dark-lighter/30 backdrop-blur-md border border-text-primary/20 rounded-2xl p-6 text-center hover:border-primary/50 transition-colors"
                     initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
                     whileHover={{ scale: 1.02, y: -5 }}
                   >
@@ -424,6 +425,12 @@ export default function About() {
               })}
             </div>
           </motion.div>
+        ) : (
+          <div className="mt-20 text-center py-12">
+            <p className="text-text-primary/60">
+              No team members added yet. Add them in Sanity Studio → About Page → Team Members
+            </p>
+          </div>
         )}
       </div>
       </section>
