@@ -7,8 +7,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { sanityClient, urlFor } from "@/lib/sanity";
 import ElectricBorder from "@/components/ElectricBorder";
-import LiquidEther from "@/components/LiquidEther";
+import dynamic from "next/dynamic";
+import { shouldDisableHeavyEffects } from "@/lib/utils";
 import PaymentModal from "@/components/PaymentModal";
+
+// Lazy load LiquidEther - only load on desktop
+const LiquidEther = dynamic(() => import("@/components/LiquidEther"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+});
 import DownloadButton from "@/components/DownloadButton";
 import VideoModal from "@/components/VideoModal";
 import {
@@ -178,8 +185,14 @@ export default function ProductPage() {
   /* ================= UI ================= */
 
   return (
-    <div className="min-h-screen bg-dark">
-      <LiquidEther autoDemo />
+    <div className="min-h-screen bg-dark relative">
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        {!shouldDisableHeavyEffects() ? (
+          <LiquidEther autoDemo />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+        )}
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-20">
         <Link href="/shop" className="inline-flex items-center gap-2 mb-8 text-text-primary hover:text-primary">

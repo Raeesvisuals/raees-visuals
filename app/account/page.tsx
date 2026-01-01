@@ -7,7 +7,14 @@ import Link from "next/link";
 import { getUserPurchases, setCurrentUser, currentUser, mockUsers } from "@/data/user";
 import { shopProducts } from "@/data/shop";
 import { FaDownload, FaArrowLeft, FaUser, FaShoppingBag, FaSignInAlt } from "react-icons/fa";
-import LiquidEther from "@/components/LiquidEther";
+import dynamic from "next/dynamic";
+import { shouldDisableHeavyEffects } from "@/lib/utils";
+
+// Lazy load LiquidEther - only load on desktop
+const LiquidEther = dynamic(() => import("@/components/LiquidEther"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+});
 
 export default function AccountPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!currentUser);
@@ -41,17 +48,21 @@ export default function AccountPage() {
       <div className="min-h-screen bg-dark">
         {/* Liquid Ether Background */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
-          <LiquidEther
-            colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
-            mouseForce={15}
-            cursorSize={100}
-            isViscous={true}
-            viscous={20}
-            resolution={0.3}
-            autoDemo={true}
-            autoSpeed={0.2}
-            autoIntensity={1.0}
-          />
+          {!shouldDisableHeavyEffects() ? (
+            <LiquidEther
+              colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
+              mouseForce={15}
+              cursorSize={100}
+              isViscous={true}
+              viscous={20}
+              resolution={0.3}
+              autoDemo={true}
+              autoSpeed={0.2}
+              autoIntensity={1.0}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+          )}
         </div>
         
         <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-lighter/20 to-dark pointer-events-none" />
@@ -137,17 +148,21 @@ export default function AccountPage() {
     <div className="min-h-screen bg-dark">
       {/* Liquid Ether Background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <LiquidEther
-          colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
-          mouseForce={15}
-          cursorSize={100}
-          isViscous={true}
-          viscous={20}
-          resolution={0.3}
-          autoDemo={true}
-          autoSpeed={0.2}
-          autoIntensity={1.0}
-        />
+        {!shouldDisableHeavyEffects() ? (
+          <LiquidEther
+            colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
+            mouseForce={15}
+            cursorSize={100}
+            isViscous={true}
+            viscous={20}
+            resolution={0.3}
+            autoDemo={true}
+            autoSpeed={0.2}
+            autoIntensity={1.0}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+        )}
       </div>
       
       <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-lighter/20 to-dark pointer-events-none" />

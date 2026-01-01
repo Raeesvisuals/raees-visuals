@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
 
@@ -54,9 +54,31 @@ export default function LiquidEther({
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const isVisibleRef = useRef(true);
   const resizeRafRef = useRef<number | null>(null);
+  const [hasError, setHasError] = useState(false);
+
+  // Check if WebGL is supported
+  const checkWebGLSupport = () => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      return !!gl;
+    } catch (e) {
+      return false;
+    }
+  };
 
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    // Check WebGL support before initializing
+    if (!checkWebGLSupport()) {
+      console.warn('WebGL not supported, skipping LiquidEther initialization');
+      setHasError(true);
+      return;
+    }
+
+    try {
 
     function makePaletteTexture(stops: string[]) {
       let arr;
@@ -1115,6 +1137,11 @@ export default function LiquidEther({
     ro.observe(container);
     resizeObserverRef.current = ro;
 
+    } catch (error) {
+      console.error('LiquidEther initialization error:', error);
+      setHasError(true);
+    }
+
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (resizeObserverRef.current) {
@@ -1132,7 +1159,11 @@ export default function LiquidEther({
         }
       }
       if (webglRef.current) {
-        webglRef.current.dispose();
+        try {
+          webglRef.current.dispose();
+        } catch (e) {
+          // Silence
+        }
       }
       webglRef.current = null;
     };
@@ -1205,6 +1236,15 @@ export default function LiquidEther({
     autoResumeDelay,
     autoRampDuration
   ]);
+
+  // If there's an error or WebGL is not supported, show fallback
+  if (hasError) {
+    return (
+      <div className={`liquid-ether-container ${className || ''}`} style={style}>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+      </div>
+    );
+  }
 
   return <div ref={mountRef} className={`liquid-ether-container ${className || ''}`} style={style} />;
 }

@@ -6,8 +6,15 @@ import { useRef } from "react";
 import Tilt from "react-parallax-tilt";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { sanityClient, urlFor } from "@/lib/sanity";
-import LiquidEther from "./LiquidEther";
+import { shouldDisableHeavyEffects } from "@/lib/utils";
+
+// Lazy load LiquidEther - only load on desktop
+const LiquidEther = dynamic(() => import("./LiquidEther"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+});
 
 type BlogPost = {
   _id: string;
@@ -112,16 +119,20 @@ const BlogSection: React.FC = () => {
     >
       {/* Liquid Ether Background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <LiquidEther
-          colors={["#B19EEF", "#FF9FFC", "#00FFFF"]}
-          mouseForce={18}
-          cursorSize={110}
-          isViscous={false}
-          resolution={0.4}
-          autoDemo={true}
-          autoSpeed={0.25}
-          autoIntensity={1.8}
-        />
+        {!shouldDisableHeavyEffects() ? (
+          <LiquidEther
+            colors={["#B19EEF", "#FF9FFC", "#00FFFF"]}
+            mouseForce={18}
+            cursorSize={110}
+            isViscous={false}
+            resolution={0.4}
+            autoDemo={true}
+            autoSpeed={0.25}
+            autoIntensity={1.8}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
+        )}
       </div>
       
       {/* Background Effects */}
