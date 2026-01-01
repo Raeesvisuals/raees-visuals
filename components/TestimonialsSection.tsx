@@ -148,7 +148,7 @@ const TestimonialsSection: React.FC = () => {
                 }}
                 drag="x"
                 dragConstraints={{ 
-                  left: testimonials.length <= 3 ? 0 : `-${Math.max(0, (testimonials.length - 3) * 100 / 3)}%`,
+                  left: 0,
                   right: 0
                 }}
                 dragElastic={0.2}
