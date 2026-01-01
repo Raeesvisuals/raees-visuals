@@ -124,126 +124,131 @@ const TestimonialsSection: React.FC = () => {
         {testimonials.length > 0 ? (
           <div className="relative">
             {/* Slider Container */}
-            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-visible">
+            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-hidden">
               <div className="relative w-full max-w-7xl mx-auto flex items-center justify-center">
-                <AnimatePresence mode="wait">
-                  {displayedTestimonials.map((testimonial, position) => {
-                    if (!testimonial) return null;
+                {displayedTestimonials.map((testimonial, position) => {
+                  if (!testimonial) return null;
 
-                    const imageUrl = testimonial.image
-                      ? urlFor(testimonial.image)
-                          .width(150)
-                          .height(150)
-                          .fit("crop")
-                          .url()
-                      : null;
+                  const imageUrl = testimonial.image
+                    ? urlFor(testimonial.image)
+                        .width(150)
+                        .height(150)
+                        .fit("crop")
+                        .url()
+                    : null;
 
-                    // Position: -1 = left, 0 = center, 1 = right
-                    const isCenter = position === 1;
-                    const isLeft = position === 0;
-                    const isRight = position === 2;
+                  // Position: 0 = left, 1 = center, 2 = right
+                  const isCenter = position === 1;
+                  const isLeft = position === 0;
+                  const isRight = position === 2;
 
-                    return (
-                      <motion.div
-                        key={`${testimonial._id}-${currentIndex}`}
-                        layout
-                        initial={false}
-                        animate={{
-                          x: isLeft ? '-50%' : isCenter ? '0%' : '50%',
-                          scale: isCenter ? 1 : 0.75,
-                          opacity: isCenter ? 1 : 0.6,
-                          zIndex: isCenter ? 10 : isLeft ? 5 : 5,
-                        }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                          mass: 0.8
-                        }}
-                        className={`absolute ${
-                          isCenter 
-                            ? 'w-full max-w-4xl' 
-                            : 'w-full max-w-3xl'
-                        }`}
-                        style={{
-                          left: isLeft ? '0%' : isCenter ? '50%' : '100%',
-                          transform: `translateX(${isLeft ? '-50%' : isCenter ? '-50%' : '-50%'})`,
-                        }}
-                      >
-                        <div className={`
-                          bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8
-                          transition-all duration-300
-                          ${isCenter 
-                            ? 'border-primary/30 shadow-lg shadow-primary/10' 
-                            : 'border-text-primary/10 hover:border-text-primary/20'
-                          }
+                  // Calculate positions for smooth sliding
+                  const leftPosition = isLeft ? '-35%' : isCenter ? '0%' : '35%';
+                  const centerX = isLeft ? '-50%' : isCenter ? '-50%' : '-50%';
+
+                  return (
+                    <motion.div
+                      key={`${testimonial._id}-${currentIndex}-${position}`}
+                      initial={{
+                        x: isLeft ? '-135%' : isCenter ? '0%' : '135%',
+                        scale: isCenter ? 1 : 0.75,
+                        opacity: isCenter ? 1 : 0.5,
+                      }}
+                      animate={{
+                        x: leftPosition,
+                        scale: isCenter ? 1 : 0.75,
+                        opacity: isCenter ? 1 : 0.6,
+                        zIndex: isCenter ? 10 : isLeft ? 5 : 5,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 25,
+                        mass: 0.7
+                      }}
+                      className={`absolute ${
+                        isCenter 
+                          ? 'w-full max-w-4xl' 
+                          : 'w-full max-w-3xl'
+                      }`}
+                      style={{
+                        left: '50%',
+                        transform: `translateX(${centerX})`,
+                      }}
+                    >
+                      <div className={`
+                        bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8
+                        transition-all duration-300
+                        ${isCenter 
+                          ? 'border-primary/30 shadow-lg shadow-primary/10' 
+                          : 'border-text-primary/10 hover:border-text-primary/20'
+                        }
+                      `}>
+                        {/* Stars */}
+                        <div className="flex gap-1 mb-4 justify-center">
+                          {[...Array(testimonial.rating || 5)].map((_, i) => (
+                            <FiStar 
+                              key={i} 
+                              className={`text-yellow-400 fill-yellow-400 ${
+                                isCenter ? 'w-6 h-6' : 'w-4 h-4'
+                              }`} 
+                            />
+                          ))}
+                        </div>
+
+                        {/* Content */}
+                        <p className={`
+                          text-text-primary/90 mb-6 leading-relaxed text-center italic
+                          ${isCenter ? 'text-base md:text-lg' : 'text-sm md:text-base'}
                         `}>
-                          {/* Stars */}
-                          <div className="flex gap-1 mb-4 justify-center">
-                            {[...Array(testimonial.rating || 5)].map((_, i) => (
-                              <FiStar 
-                                key={i} 
-                                className={`text-yellow-400 fill-yellow-400 ${
-                                  isCenter ? 'w-6 h-6' : 'w-4 h-4'
-                                }`} 
+                          &quot;{testimonial.quote}&quot;
+                        </p>
+
+                        {/* Author */}
+                        <div className="flex items-center gap-4 justify-center">
+                          {imageUrl && (
+                            <div className={`
+                              rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0
+                              ${isCenter ? 'w-16 h-16' : 'w-12 h-12'}
+                            `}>
+                              <Image
+                                src={imageUrl}
+                                alt={testimonial.name}
+                                width={isCenter ? 64 : 48}
+                                height={isCenter ? 64 : 48}
+                                className="w-full h-full object-cover"
                               />
-                            ))}
-                          </div>
-
-                          {/* Content */}
-                          <p className={`
-                            text-text-primary/90 mb-6 leading-relaxed text-center italic
-                            ${isCenter ? 'text-base md:text-lg' : 'text-sm md:text-base'}
-                          `}>
-                            &quot;{testimonial.quote}&quot;
-                          </p>
-
-                          {/* Author */}
-                          <div className="flex items-center gap-4 justify-center">
-                            {imageUrl && (
+                            </div>
+                          )}
+                          <div className="text-center">
+                            <div className={`
+                              font-semibold text-text-primary mb-1
+                              ${isCenter ? 'text-lg' : 'text-base'}
+                            `}>
+                              {testimonial.name}
+                            </div>
+                            {testimonial.role && (
                               <div className={`
-                                rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0
-                                ${isCenter ? 'w-16 h-16' : 'w-12 h-12'}
+                                text-text-primary/60 mb-1
+                                ${isCenter ? 'text-sm' : 'text-xs'}
                               `}>
-                                <Image
-                                  src={imageUrl}
-                                  alt={testimonial.name}
-                                  width={isCenter ? 64 : 48}
-                                  height={isCenter ? 64 : 48}
-                                  className="w-full h-full object-cover"
-                                />
+                                {testimonial.role}
                               </div>
                             )}
-                            <div className="text-center">
+                            {testimonial.niche && (
                               <div className={`
-                                font-semibold text-text-primary mb-1
-                                ${isCenter ? 'text-lg' : 'text-base'}
+                                text-primary font-medium
+                                ${isCenter ? 'text-xs' : 'text-xs opacity-80'}
                               `}>
-                                {testimonial.name}
+                                {testimonial.niche}
                               </div>
-                              {testimonial.role && (
-                                <div className={`
-                                  text-text-primary/60 mb-1
-                                  ${isCenter ? 'text-sm' : 'text-xs'}
-                                `}>
-                                  {testimonial.role}
-                                </div>
-                              )}
-                              {testimonial.niche && (
-                                <div className={`
-                                  text-primary font-medium
-                                  ${isCenter ? 'text-xs' : 'text-xs opacity-80'}
-                                `}>
-                                  {testimonial.niche}
-                                </div>
-                              )}
-                            </div>
+                            )}
                           </div>
                         </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
 
               {/* Navigation Arrows */}
