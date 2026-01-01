@@ -857,6 +857,16 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
         product={paymentModal.product}
         onPaymentSuccess={handlePaymentSuccess}
       />
+
+      {/* Preview Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ isOpen: false, videoSrc: "", isYouTube: false })}
+        videoSrc={videoModal.videoSrc}
+        isYouTube={videoModal.isYouTube}
+        youtubeId={videoModal.youtubeId}
+        format="horizontal"
+      />
     </section>
   );
 };
