@@ -23,7 +23,9 @@ const TestimonialsSection: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const prevIndexRef = useRef(0);
 
   useEffect(() => {
     async function fetchTestimonials() {
@@ -59,7 +61,11 @@ const TestimonialsSection: React.FC = () => {
     if (testimonials.length <= 1) return;
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      setDirection(1);
+      setCurrentIndex((prev) => {
+        prevIndexRef.current = prev;
+        return (prev + 1) % testimonials.length;
+      });
     }, 5000); // Change slide every 5 seconds
 
     return () => {
@@ -74,15 +80,19 @@ const TestimonialsSection: React.FC = () => {
     return index;
   };
 
-  const paginate = (direction: number) => {
+  const paginate = (dir: number) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    if (direction === 1) {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-    } else {
-      setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-    }
+    setDirection(dir);
+    setCurrentIndex((prev) => {
+      prevIndexRef.current = prev;
+      if (dir === 1) {
+        return (prev + 1) % testimonials.length;
+      } else {
+        return (prev - 1 + testimonials.length) % testimonials.length;
+      }
+    });
   };
 
   // Get the three testimonials to display
@@ -143,17 +153,40 @@ const TestimonialsSection: React.FC = () => {
                   const isRight = position === 2;
 
                   // Calculate pixel positions for proper alignment
-                  // Center card at 0, left at -400px, right at +400px (adjust based on card width)
+                  // Center card at 0, left at -450px, right at +450px
                   const getXPosition = () => {
-                    if (isLeft) return -400; // Left side
+                    if (isLeft) return -450; // Left side
                     if (isCenter) return 0; // Center
-                    return 400; // Right side
+                    return 450; // Right side
                   };
 
+                  // Initial position based on direction and current position
                   const getInitialX = () => {
-                    if (isLeft) return -800; // Start further left
-                    if (isCenter) return 0; // Start at center
-                    return 800; // Start further right
+                    // When moving forward (direction = 1):
+                    // - Left card should come from further left
+                    // - Center card should come from right (was right card)
+                    // - Right card should come from further right
+                    // When moving backward (direction = -1):
+                    // - Left card should come from center (was center card)
+                    // - Center card should come from left (was left card)
+                    // - Right card should come from further right
+                    
+                    if (direction === 1) {
+                      // Moving forward: cards slide left
+                      if (isLeft) return -900; // Coming from far left
+                      if (isCenter) return 900; // Coming from right (was right card)
+                      return 900; // Coming from right
+                    } else if (direction === -1) {
+                      // Moving backward: cards slide right
+                      if (isLeft) return 0; // Coming from center (was center card)
+                      if (isCenter) return -900; // Coming from left (was left card)
+                      return 900; // Staying on right
+                    } else {
+                      // Initial load
+                      if (isLeft) return -900;
+                      if (isCenter) return 0;
+                      return 900;
+                    }
                   };
 
                   return (
