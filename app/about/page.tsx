@@ -340,13 +340,20 @@ export default function About() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {team.map((member, index) => {
-                const imageUrl = member.image
-                  ? urlFor(member.image)
+                let imageUrl: string | undefined = undefined;
+                
+                if (member.image) {
+                  try {
+                    imageUrl = urlFor(member.image)
                       .width(200)
                       .height(200)
                       .fit("crop")
-                      .url()
-                  : undefined;
+                      .auto('format')
+                      .url();
+                  } catch (error) {
+                    console.error("Error generating team image URL:", error);
+                  }
+                }
 
                 return (
                   <motion.div
@@ -357,22 +364,29 @@ export default function About() {
                     transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
                     whileHover={{ scale: 1.02, y: -5 }}
                   >
-                    {imageUrl && (
+                    {imageUrl ? (
                       <div className="relative mb-4 w-20 h-20 mx-auto">
                         <Image
                           src={imageUrl}
-                          alt={member.name || ""}
+                          alt={member.name || "Team member"}
                           width={80}
                           height={80}
                           className="w-20 h-20 rounded-full object-cover border-2 border-primary/30"
                         />
-                        <div className="absolute inset-0 w-20 h-20 rounded-full mx-auto bg-primary/20 animate-pulse" />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-primary/20 mx-auto mb-4 flex items-center justify-center">
+                        <span className="text-primary text-2xl font-bold">
+                          {member.name?.[0]?.toUpperCase() || "?"}
+                        </span>
                       </div>
                     )}
                     <h4 className="text-lg font-semibold text-text-primary mb-1">
-                      {member.name}
+                      {member.name || "Team Member"}
                     </h4>
-                    <p className="text-text-primary/60 text-sm">{member.role}</p>
+                    <p className="text-text-primary/60 text-sm">
+                      {member.role || "Team Member"}
+                    </p>
                   </motion.div>
                 );
               })}

@@ -260,33 +260,69 @@ const AboutSection: React.FC = () => {
       </div>
 
       {/* TEAM */}
-      {team.length > 0 && (
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {team.map((member, i) => {
-            const imageUrl = member.image
-              ? urlFor(member.image).width(200).height(200).fit("crop").url()
-              : undefined;
+      {team && team.length > 0 && (
+        <motion.div
+          className="mt-20"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <h3 className="text-3xl font-bold text-text-primary text-center mb-12">
+            Meet Our <span className="text-primary glow-text">Team</span>
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {team.map((member, i) => {
+              let imageUrl: string | undefined = undefined;
+              
+              if (member.image) {
+                try {
+                  imageUrl = urlFor(member.image)
+                    .width(200)
+                    .height(200)
+                    .fit("crop")
+                    .auto('format')
+                    .url();
+                } catch (error) {
+                  console.error("Error generating team image URL:", error);
+                }
+              }
 
-            return (
-              <div
-                key={i}
-                className="text-center p-6 rounded-2xl bg-dark-lighter/30"
-              >
-                {imageUrl && (
-                  <Image
-                    src={imageUrl}
-                    alt={member.name || ""}
-                    width={80}
-                    height={80}
-                    className="rounded-full mx-auto mb-4"
-                  />
-                )}
-                <h4 className="font-semibold">{member.name}</h4>
-                <p className="text-sm opacity-60">{member.role}</p>
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <motion.div
+                  key={i}
+                  className="text-center p-6 rounded-2xl bg-dark-lighter/30 backdrop-blur-md border border-text-primary/20 hover:border-primary/50 transition-colors"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.6 + i * 0.1 }}
+                >
+                  {imageUrl ? (
+                    <div className="relative mb-4 w-20 h-20 mx-auto">
+                      <Image
+                        src={imageUrl}
+                        alt={member.name || "Team member"}
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-primary/30"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-primary/20 mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-primary text-2xl font-bold">
+                        {member.name?.[0]?.toUpperCase() || "?"}
+                      </span>
+                    </div>
+                  )}
+                  <h4 className="text-lg font-semibold text-text-primary mb-1">
+                    {member.name || "Team Member"}
+                  </h4>
+                  <p className="text-sm text-text-primary/60">
+                    {member.role || "Team Member"}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       )}
     </section>
   );
