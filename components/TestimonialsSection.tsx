@@ -124,8 +124,8 @@ const TestimonialsSection: React.FC = () => {
         {testimonials.length > 0 ? (
           <div className="relative">
             {/* Slider Container */}
-            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-hidden">
-              <div className="relative w-full max-w-7xl mx-auto flex items-center justify-center">
+            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-visible">
+              <div className="relative w-full max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
                 {displayedTestimonials.map((testimonial, position) => {
                   if (!testimonial) return null;
 
@@ -142,29 +142,39 @@ const TestimonialsSection: React.FC = () => {
                   const isLeft = position === 0;
                   const isRight = position === 2;
 
-                  // Calculate positions for smooth sliding
-                  const leftPosition = isLeft ? '-35%' : isCenter ? '0%' : '35%';
-                  const centerX = isLeft ? '-50%' : isCenter ? '-50%' : '-50%';
+                  // Calculate pixel positions for proper alignment
+                  // Center card at 0, left at -400px, right at +400px (adjust based on card width)
+                  const getXPosition = () => {
+                    if (isLeft) return -400; // Left side
+                    if (isCenter) return 0; // Center
+                    return 400; // Right side
+                  };
+
+                  const getInitialX = () => {
+                    if (isLeft) return -800; // Start further left
+                    if (isCenter) return 0; // Start at center
+                    return 800; // Start further right
+                  };
 
                   return (
                     <motion.div
                       key={`${testimonial._id}-${currentIndex}-${position}`}
                       initial={{
-                        x: isLeft ? '-135%' : isCenter ? '0%' : '135%',
+                        x: getInitialX(),
                         scale: isCenter ? 1 : 0.75,
-                        opacity: isCenter ? 1 : 0.5,
+                        opacity: isCenter ? 1 : 0.4,
                       }}
                       animate={{
-                        x: leftPosition,
+                        x: getXPosition(),
                         scale: isCenter ? 1 : 0.75,
                         opacity: isCenter ? 1 : 0.6,
                         zIndex: isCenter ? 10 : isLeft ? 5 : 5,
                       }}
                       transition={{
                         type: "spring",
-                        stiffness: 260,
-                        damping: 25,
-                        mass: 0.7
+                        stiffness: 280,
+                        damping: 28,
+                        mass: 0.6
                       }}
                       className={`absolute ${
                         isCenter 
@@ -173,7 +183,7 @@ const TestimonialsSection: React.FC = () => {
                       }`}
                       style={{
                         left: '50%',
-                        transform: `translateX(${centerX})`,
+                        transform: 'translateX(-50%)',
                       }}
                     >
                       <div className={`
