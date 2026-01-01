@@ -119,7 +119,7 @@ export default function LiquidEther({
       return tex;
     };
 
-    const paletteTex = makePaletteTexture(colorsArray);
+    const paletteTex = makePaletteTexture(colors);
     const bgVec4 = new THREE.Vector4(0, 0, 0, 0); // always transparent
 
     class CommonClass {
