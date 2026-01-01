@@ -55,11 +55,16 @@ export default function LiquidEther({
   const isVisibleRef = useRef(true);
   const resizeRafRef = useRef<number | null>(null);
   const [hasError, setHasError] = useState(false);
-
-  // Memoize colors to prevent infinite loops - compare by value, not reference
-  // Convert colors array to string for stable comparison
-  const colorsString = useMemo(() => JSON.stringify(colors), [colors.join(',')]);
-  const colorsArray = useMemo(() => colors, [colorsString]);
+  const colorsRef = useRef<string>('');
+  
+  // Memoize colors string to prevent infinite loops - compare by value, not reference
+  const colorsString = useMemo(() => {
+    const str = colors.join(',');
+    if (colorsRef.current !== str) {
+      colorsRef.current = str;
+    }
+    return colorsRef.current;
+  }, [colors.join(',')]);
 
   // Check if WebGL is supported
   const checkWebGLSupport = () => {
