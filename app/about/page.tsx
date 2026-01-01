@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Image from 'next/image';
 import ProfileCard from '@/components/ProfileCard';
+import AboutIntroVideo from '@/components/AboutIntroVideo';
 import { FaEdit, FaPalette, FaVideo, FaMagic, FaCogs } from 'react-icons/fa';
 import { sanityClient, urlFor } from '@/lib/sanity';
 
@@ -41,6 +42,20 @@ type AboutData = {
   software?: AboutSoftware[];
   services?: AboutService[];
   team?: AboutTeamMember[];
+  // Intro video fields
+  aboutIntroTitle?: string;
+  aboutIntroText?: string;
+  aboutIntroVideoType?: "youtube" | "upload";
+  aboutIntroYoutubeUrl?: string;
+  aboutIntroVideoFile?: {
+    asset?: {
+      url?: string;
+      mimeType?: string;
+    };
+  };
+  aboutIntroVideoThumbnail?: any;
+  aboutIntroPrimaryButton?: string;
+  aboutIntroSecondaryButton?: string;
 };
 
 const iconMap = {
@@ -99,7 +114,24 @@ export default function About() {
                 hotspot,
                 crop
               }
-            }
+            },
+            aboutIntroTitle,
+            aboutIntroText,
+            aboutIntroVideoType,
+            aboutIntroYoutubeUrl,
+            aboutIntroVideoFile{
+              asset->{
+                url,
+                mimeType
+              }
+            },
+            aboutIntroVideoThumbnail{
+              asset,
+              hotspot,
+              crop
+            },
+            aboutIntroPrimaryButton,
+            aboutIntroSecondaryButton
           }`
         );
         console.log("✅ About page data fetched:", result);
@@ -197,7 +229,7 @@ export default function About() {
 
   return (
     <div className="min-h-[calc(100vh-8rem)]">
-      <section ref={sectionRef} className="relative min-h-screen py-20 px-4 overflow-hidden bg-dark">
+      <section ref={sectionRef} className="relative py-20 px-4 overflow-hidden bg-dark">
       {/* Background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
@@ -327,7 +359,7 @@ export default function About() {
         </div>
 
         {/* Team Members Section */}
-        {team.length > 0 && (
+        {team && team.length > 0 && (
           <motion.div
             className="mt-20"
             initial={{ opacity: 0, y: 30 }}
@@ -360,7 +392,7 @@ export default function About() {
                     key={`${member.name}-${index}`}
                     className="bg-dark-lighter/30 backdrop-blur-md border border-text-primary/20 rounded-2xl p-6 text-center hover:border-primary/50 transition-colors"
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
                     whileHover={{ scale: 1.02, y: -5 }}
                   >
@@ -396,6 +428,8 @@ export default function About() {
       </div>
       </section>
 
+      {/* Intro Video Section */}
+      <AboutIntroVideo />
     </div>
   );
 }
