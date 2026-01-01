@@ -8,6 +8,7 @@ import { sanityClient, urlFor } from "@/lib/sanity";
 import ElectricBorder from "./ElectricBorder";
 import PaymentModal from "./PaymentModal";
 import DownloadButton from "./DownloadButton";
+import VideoModal from "./VideoModal";
 import { isProductPurchased, addPurchase } from "@/data/user";
 import { calculateIsNew } from "@/lib/fileMetadata";
 import { FaPlay, FaDownload, FaStar, FaTag, FaShoppingCart, FaUser, FaGift, FaSearch } from "react-icons/fa";
@@ -71,6 +72,11 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
     isOpen: false,
     product: null
   });
+  const [videoModal, setVideoModal] = useState<{ isOpen: boolean; videoSrc: string; isYouTube: boolean; youtubeId?: string }>({
+    isOpen: false,
+    videoSrc: "",
+    isYouTube: false,
+  });
 
   useEffect(() => {
     async function fetchProducts() {
@@ -127,6 +133,10 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
             createdAt
           }`
         );
+        
+        console.log("📦 Shop: Products fetched:", result?.length || 0);
+        console.log("📦 Shop: Products data:", result);
+        
         setProducts(result || []);
 
         // Fetch categories
@@ -212,6 +222,37 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
   const hasMoreProducts = isHomepage 
     ? sortedProducts.length > 4 // Homepage: has more if total > 4
     : visibleItems < sortedProducts.length; // Shop page: has more if visible < total
+
+  // Helper to get YouTube video ID
+  const getYouTubeVideoId = (url: string): string | null => {
+    try {
+      if (url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
+      if (url.includes("shorts/")) return url.split("shorts/")[1].split("?")[0];
+      if (url.includes("embed/")) return url.split("embed/")[1].split("?")[0];
+      return new URL(url).searchParams.get("v");
+    } catch {
+      return null;
+    }
+  };
+
+  // Handle preview video click
+  const handlePreviewVideo = (product: Product) => {
+    if (product.previewVideo?.videoType === "youtube" && product.previewVideo?.youtubeUrl) {
+      const videoId = getYouTubeVideoId(product.previewVideo.youtubeUrl);
+      setVideoModal({
+        isOpen: true,
+        videoSrc: product.previewVideo.youtubeUrl,
+        isYouTube: true,
+        youtubeId: videoId || undefined,
+      });
+    } else if (product.previewVideo?.videoFile?.asset?.url) {
+      setVideoModal({
+        isOpen: true,
+        videoSrc: product.previewVideo.videoFile.asset.url,
+        isYouTube: false,
+      });
+    }
+  };
 
   // Function to load more items (shop page only)
   const loadMoreItems = () => {
@@ -522,9 +563,14 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
                         )}
                         
                         {/* Preview Video Overlay */}
-                        {(product.previewVideo?.youtubeUrl || product.previewVideo?.videoFile) && (
-                          <motion.div
-                            className="absolute inset-0 bg-primary/20 flex items-center justify-center"
+                        {(product.previewVideo?.youtubeUrl || product.previewVideo?.videoFile?.asset?.url) && (
+                          <motion.button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handlePreviewVideo(product);
+                            }}
+                            className="absolute inset-0 bg-primary/20 flex items-center justify-center cursor-pointer z-10"
                             initial={{ opacity: 0 }}
                             whileHover={{ opacity: 1 }}
                             transition={{ duration: 0.3 }}
@@ -535,7 +581,7 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
                             >
                               <FaPlay className="text-primary text-xl ml-1" />
                             </motion.div>
-                          </motion.div>
+                          </motion.button>
                         )}
 
                         {/* Badges */}
