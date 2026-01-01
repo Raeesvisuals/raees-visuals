@@ -130,11 +130,14 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
           ))}
         </div>
 
-        {/* GRID - Responsive layout with proper short sizing */}
+        {/* GRID - Auto-flow dense layout that fills gaps automatically */}
         <AnimatePresence>
           <motion.div
             layout
-            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 auto-rows-max"
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6"
+            style={{
+              gridAutoFlow: 'dense',
+            }}
           >
             {displayed.map((item) => {
               const videoUrl = getVideoUrl(item);
@@ -146,7 +149,10 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
                 <motion.div
                   key={item._id}
                   layout
-                  className={`${isShort ? "col-span-1 max-w-[160px] sm:max-w-[200px] md:max-w-[240px] mx-auto lg:max-w-[280px]" : "col-span-2 sm:col-span-1 lg:col-span-1"}`}
+                  className={`${isShort ? "col-span-1" : "col-span-1 sm:col-span-1 md:col-span-1 lg:col-span-1"}`}
+                  style={{
+                    gridRow: isShort ? 'span 2' : 'span 1',
+                  }}
                 >
                   <Tilt scale={1.02}>
                     <div className="group relative rounded-2xl overflow-hidden h-full flex flex-col">
