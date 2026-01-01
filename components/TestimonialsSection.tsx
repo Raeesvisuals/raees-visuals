@@ -23,7 +23,6 @@ const TestimonialsSection: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -60,7 +59,6 @@ const TestimonialsSection: React.FC = () => {
     if (testimonials.length <= 1) return;
 
     intervalRef.current = setInterval(() => {
-      setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000); // Change slide every 5 seconds
 
@@ -71,39 +69,35 @@ const TestimonialsSection: React.FC = () => {
     };
   }, [testimonials.length]);
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    })
+  const getTestimonialIndex = (offset: number) => {
+    const index = (currentIndex + offset + testimonials.length) % testimonials.length;
+    return index;
   };
 
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
-
-  const paginate = (newDirection: number) => {
+  const paginate = (direction: number) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    setDirection(newDirection);
-    if (newDirection === 1) {
+    if (direction === 1) {
       setCurrentIndex((prev) => (prev + 1) % testimonials.length);
     } else {
       setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
     }
   };
+
+  // Get the three testimonials to display
+  const getDisplayedTestimonials = () => {
+    if (testimonials.length === 0) return [];
+    if (testimonials.length === 1) return [testimonials[0], null, null];
+    if (testimonials.length === 2) return [testimonials[getTestimonialIndex(-1)], testimonials[currentIndex], testimonials[currentIndex]];
+    return [
+      testimonials[getTestimonialIndex(-1)], // Left (previous)
+      testimonials[currentIndex], // Center (current)
+      testimonials[getTestimonialIndex(1)] // Right (next)
+    ];
+  };
+
+  const displayedTestimonials = getDisplayedTestimonials();
 
   return (
     <section ref={sectionRef} className="relative py-20 px-4 overflow-hidden">
@@ -130,35 +124,12 @@ const TestimonialsSection: React.FC = () => {
         {testimonials.length > 0 ? (
           <div className="relative">
             {/* Slider Container */}
-            <div className="relative overflow-hidden rounded-2xl">
-              <AnimatePresence initial={false} custom={direction}>
-                <motion.div
-                  key={currentIndex}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    x: { type: "spring", stiffness: 300, damping: 30 },
-                    opacity: { duration: 0.2 }
-                  }}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={1}
-                  onDragEnd={(e, { offset, velocity }) => {
-                    const swipe = swipePower(offset.x, velocity.x);
+            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-visible">
+              <div className="relative w-full max-w-7xl mx-auto flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  {displayedTestimonials.map((testimonial, position) => {
+                    if (!testimonial) return null;
 
-                    if (swipe < -swipeConfidenceThreshold) {
-                      paginate(1);
-                    } else if (swipe > swipeConfidenceThreshold) {
-                      paginate(-1);
-                    }
-                  }}
-                  className="w-full"
-                >
-                  {(() => {
-                    const testimonial = testimonials[currentIndex];
                     const imageUrl = testimonial.image
                       ? urlFor(testimonial.image)
                           .width(150)
@@ -167,70 +138,127 @@ const TestimonialsSection: React.FC = () => {
                           .url()
                       : null;
 
+                    // Position: -1 = left, 0 = center, 1 = right
+                    const isCenter = position === 1;
+                    const isLeft = position === 0;
+                    const isRight = position === 2;
+
                     return (
-                      <div className="max-w-4xl mx-auto">
-                        <div className="bg-dark-lighter/50 backdrop-blur-md border border-text-primary/10 rounded-2xl p-8 md:p-12 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
+                      <motion.div
+                        key={`${testimonial._id}-${currentIndex}`}
+                        layout
+                        initial={false}
+                        animate={{
+                          x: isLeft ? '-50%' : isCenter ? '0%' : '50%',
+                          scale: isCenter ? 1 : 0.75,
+                          opacity: isCenter ? 1 : 0.6,
+                          zIndex: isCenter ? 10 : isLeft ? 5 : 5,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                          mass: 0.8
+                        }}
+                        className={`absolute ${
+                          isCenter 
+                            ? 'w-full max-w-4xl' 
+                            : 'w-full max-w-3xl'
+                        }`}
+                        style={{
+                          left: isLeft ? '0%' : isCenter ? '50%' : '100%',
+                          transform: `translateX(${isLeft ? '-50%' : isCenter ? '-50%' : '-50%'})`,
+                        }}
+                      >
+                        <div className={`
+                          bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8
+                          transition-all duration-300
+                          ${isCenter 
+                            ? 'border-primary/30 shadow-lg shadow-primary/10' 
+                            : 'border-text-primary/10 hover:border-text-primary/20'
+                          }
+                        `}>
                           {/* Stars */}
-                          <div className="flex gap-1 mb-6 justify-center">
+                          <div className="flex gap-1 mb-4 justify-center">
                             {[...Array(testimonial.rating || 5)].map((_, i) => (
-                              <FiStar key={i} className="text-yellow-400 fill-yellow-400 w-6 h-6" />
+                              <FiStar 
+                                key={i} 
+                                className={`text-yellow-400 fill-yellow-400 ${
+                                  isCenter ? 'w-6 h-6' : 'w-4 h-4'
+                                }`} 
+                              />
                             ))}
                           </div>
 
                           {/* Content */}
-                          <p className="text-text-primary/90 mb-8 leading-relaxed text-lg md:text-xl text-center italic">
+                          <p className={`
+                            text-text-primary/90 mb-6 leading-relaxed text-center italic
+                            ${isCenter ? 'text-base md:text-lg' : 'text-sm md:text-base'}
+                          `}>
                             &quot;{testimonial.quote}&quot;
                           </p>
 
                           {/* Author */}
-                          <div className="flex items-center gap-6 justify-center">
+                          <div className="flex items-center gap-4 justify-center">
                             {imageUrl && (
-                              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
+                              <div className={`
+                                rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0
+                                ${isCenter ? 'w-16 h-16' : 'w-12 h-12'}
+                              `}>
                                 <Image
                                   src={imageUrl}
                                   alt={testimonial.name}
-                                  width={80}
-                                  height={80}
+                                  width={isCenter ? 64 : 48}
+                                  height={isCenter ? 64 : 48}
                                   className="w-full h-full object-cover"
                                 />
                               </div>
                             )}
-                            <div className="text-center md:text-left">
-                              <div className="font-semibold text-text-primary text-xl mb-1">
+                            <div className="text-center">
+                              <div className={`
+                                font-semibold text-text-primary mb-1
+                                ${isCenter ? 'text-lg' : 'text-base'}
+                              `}>
                                 {testimonial.name}
                               </div>
                               {testimonial.role && (
-                                <div className="text-base text-text-primary/60 mb-1">
+                                <div className={`
+                                  text-text-primary/60 mb-1
+                                  ${isCenter ? 'text-sm' : 'text-xs'}
+                                `}>
                                   {testimonial.role}
                                 </div>
                               )}
                               {testimonial.niche && (
-                                <div className="text-sm text-primary font-medium">
+                                <div className={`
+                                  text-primary font-medium
+                                  ${isCenter ? 'text-xs' : 'text-xs opacity-80'}
+                                `}>
                                   {testimonial.niche}
                                 </div>
                               )}
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
-                  })()}
-                </motion.div>
-              </AnimatePresence>
+                  })}
+                </AnimatePresence>
+              </div>
 
               {/* Navigation Arrows */}
               {testimonials.length > 1 && (
                 <>
                   <button
                     onClick={() => paginate(-1)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-dark-lighter/80 backdrop-blur-md border border-text-primary/20 hover:border-primary/50 text-text-primary hover:text-primary transition-all flex items-center justify-center"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-dark-lighter/80 backdrop-blur-md border border-text-primary/20 hover:border-primary/50 text-text-primary hover:text-primary transition-all flex items-center justify-center"
                     aria-label="Previous testimonial"
                   >
                     <FaChevronLeft className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => paginate(1)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-dark-lighter/80 backdrop-blur-md border border-text-primary/20 hover:border-primary/50 text-text-primary hover:text-primary transition-all flex items-center justify-center"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-dark-lighter/80 backdrop-blur-md border border-text-primary/20 hover:border-primary/50 text-text-primary hover:text-primary transition-all flex items-center justify-center"
                     aria-label="Next testimonial"
                   >
                     <FaChevronRight className="w-5 h-5" />
@@ -249,7 +277,6 @@ const TestimonialsSection: React.FC = () => {
                       if (intervalRef.current) {
                         clearInterval(intervalRef.current);
                       }
-                      setDirection(index > currentIndex ? 1 : -1);
                       setCurrentIndex(index);
                     }}
                     className={`w-2 h-2 rounded-full transition-all ${
