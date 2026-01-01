@@ -6,15 +6,8 @@ import Tilt from "react-parallax-tilt";
 import Image from "next/image";
 import { FaPlay } from "react-icons/fa";
 import VideoModal from "./VideoModal";
-import dynamic from "next/dynamic";
 import { getPortfolioItems } from "@/lib/portfolio";
 import { urlFor } from "@/lib/sanity";
-import { shouldDisableHeavyEffects } from "@/lib/utils";
-
-const LiquidEther = dynamic(() => import("./LiquidEther"), { 
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-});
 
 interface PortfolioProps {
   isHomepage?: boolean;
@@ -108,11 +101,7 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
   return (
     <section ref={sectionRef} id="portfolio" className="relative py-20 px-4">
       <div className="absolute inset-0 pointer-events-none">
-        {!shouldDisableHeavyEffects() ? (
-          <LiquidEther />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-        )}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">

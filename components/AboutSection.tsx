@@ -3,17 +3,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import ProfileCard from "./ProfileCard";
 import { FaEdit, FaPalette, FaVideo, FaMagic, FaCogs } from "react-icons/fa";
 import { sanityClient, urlFor } from "@/lib/sanity";
-import { shouldDisableHeavyEffects } from "@/lib/utils";
-
-// Lazy load LiquidEther - only load on desktop, not on mobile
-const LiquidEther = dynamic(() => import("./LiquidEther"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-});
 
 type HomeAboutProfile = {
   name?: string;
@@ -63,8 +55,6 @@ const AboutSection: React.FC = () => {
 
   const [aboutData, setAboutData] = useState<AboutData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [shouldLoadEffect, setShouldLoadEffect] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     async function fetchAbout() {
@@ -174,21 +164,6 @@ const AboutSection: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    // Check if desktop on client side
-    const checkDesktop = () => {
-      const desktop = window.innerWidth >= 768;
-      setIsDesktop(desktop);
-      // Only load effect on desktop and after component is in view
-      if (desktop && isInView) {
-        setShouldLoadEffect(true);
-      }
-    };
-
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, [isInView]);
 
   return (
     <section
@@ -197,22 +172,7 @@ const AboutSection: React.FC = () => {
       className="relative py-20 px-4 overflow-hidden"
     >
       <div className="absolute inset-0 pointer-events-none">
-        {/* Only load LiquidEther on desktop and when in view */}
-        {shouldLoadEffect && !shouldDisableHeavyEffects() ? (
-          <LiquidEther
-            colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
-            mouseForce={15}
-            cursorSize={100}
-            isViscous
-            viscous={20}
-            resolution={0.3}
-            autoDemo
-            autoSpeed={0.2}
-            autoIntensity={1}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-        )}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

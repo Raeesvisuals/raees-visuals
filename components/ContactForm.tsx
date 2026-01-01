@@ -3,14 +3,6 @@
 import React, { useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import dynamic from "next/dynamic";
-import { shouldDisableHeavyEffects } from "@/lib/utils";
-
-// Lazy load LiquidEther - only load on desktop
-const LiquidEther = dynamic(() => import("./LiquidEther"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-});
 
 interface FormData {
   name: string;
@@ -110,23 +102,9 @@ const ContactForm: React.FC = () => {
       id="contact-form"
       className="relative py-20 px-4 overflow-hidden"
     >
-      {/* Liquid Ether Background */}
+      {/* Background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-        {!shouldDisableHeavyEffects() ? (
-          <LiquidEther
-            colors={["#5227FF", "#00FFFF", "#FF9FFC"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={true}
-            viscous={25}
-            resolution={0.4}
-            autoDemo={true}
-            autoSpeed={0.35}
-            autoIntensity={2.0}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-        )}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
       
       {/* Background Effects */}

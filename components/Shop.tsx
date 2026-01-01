@@ -6,15 +6,7 @@ import Tilt from "react-parallax-tilt";
 import Image from "next/image";
 import { sanityClient, urlFor } from "@/lib/sanity";
 import ElectricBorder from "./ElectricBorder";
-import dynamic from "next/dynamic";
 import PaymentModal from "./PaymentModal";
-import { shouldDisableHeavyEffects } from "@/lib/utils";
-
-// Lazy load LiquidEther - only load on desktop
-const LiquidEther = dynamic(() => import("./LiquidEther"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-});
 import DownloadButton from "./DownloadButton";
 import { isProductPurchased, addPurchase } from "@/data/user";
 import { calculateIsNew } from "@/lib/fileMetadata";
@@ -259,23 +251,9 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
 
   return (
     <section id="shop" className="relative py-20 px-4 overflow-hidden min-h-screen">
-      {/* Liquid Ether Background - Only on desktop */}
+      {/* Background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-        {!shouldDisableHeavyEffects() ? (
-          <LiquidEther
-            colors={["#7df9ff", "#ff6b9d", "#4ecdc4"]}
-            mouseForce={20}
-            cursorSize={120}
-            isViscous={true}
-            viscous={25}
-            resolution={0.4}
-            autoDemo={true}
-            autoSpeed={0.3}
-            autoIntensity={1.5}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
-        )}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-dark" />
       </div>
       
       {/* Glassmorphic Background */}
