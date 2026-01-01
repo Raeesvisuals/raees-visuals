@@ -57,7 +57,8 @@ export default function LiquidEther({
   const [hasError, setHasError] = useState(false);
 
   // Memoize colors to prevent infinite loops - compare by value, not reference
-  const colorsString = useMemo(() => JSON.stringify(colors), [JSON.stringify(colors)]);
+  // Convert colors array to string for stable comparison
+  const colorsString = useMemo(() => JSON.stringify(colors), [colors.join(',')]);
   const colorsArray = useMemo(() => colors, [colorsString]);
 
   // Check if WebGL is supported
