@@ -134,11 +134,35 @@ const TestimonialsSection: React.FC = () => {
         {testimonials.length > 0 ? (
           <div className="relative">
             {/* Slider Container */}
-            <div className="relative h-[600px] md:h-[500px] flex items-center justify-center overflow-visible">
-              <div className="relative w-full max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
-                {displayedTestimonials.map((testimonial, position) => {
-                  if (!testimonial) return null;
-
+            <div className="relative overflow-hidden">
+              <motion.div
+                className="flex gap-6"
+                animate={{
+                  x: `calc(-${currentIndex * 100}% - ${currentIndex * 1.5}rem)`
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  mass: 0.8
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = Math.abs(offset.x) * Math.sign(offset.x);
+                  const swipeThreshold = 50;
+                  
+                  if (Math.abs(swipe) > swipeThreshold || Math.abs(velocity.x) > 500) {
+                    if (swipe > 0 && currentIndex > 0) {
+                      paginate(-1);
+                    } else if (swipe < 0 && currentIndex < testimonials.length - 1) {
+                      paginate(1);
+                    }
+                  }
+                }}
+              >
+                {testimonials.map((testimonial, index) => {
                   const imageUrl = testimonial.image
                     ? urlFor(testimonial.image)
                         .width(150)
@@ -147,142 +171,72 @@ const TestimonialsSection: React.FC = () => {
                         .url()
                     : null;
 
-                  // Position: 0 = left, 1 = center, 2 = right
-                  const isCenter = position === 1;
-                  const isLeft = position === 0;
-                  const isRight = position === 2;
+                  // Calculate which cards to show (current, prev, next)
+                  const isCurrent = index === currentIndex;
+                  const isPrev = index === (currentIndex - 1 + testimonials.length) % testimonials.length;
+                  const isNext = index === (currentIndex + 1) % testimonials.length;
+                  const shouldShow = isCurrent || isPrev || isNext;
 
-                  // Calculate pixel positions for proper alignment
-                  // Center card at 0, left at -450px, right at +450px
-                  const getXPosition = () => {
-                    if (isLeft) return -450; // Left side
-                    if (isCenter) return 0; // Center
-                    return 450; // Right side
-                  };
-
-                  // Initial position based on direction and current position
-                  const getInitialX = () => {
-                    // When moving forward (direction = 1):
-                    // - Left card should come from further left
-                    // - Center card should come from right (was right card)
-                    // - Right card should come from further right
-                    // When moving backward (direction = -1):
-                    // - Left card should come from center (was center card)
-                    // - Center card should come from left (was left card)
-                    // - Right card should come from further right
-                    
-                    if (direction === 1) {
-                      // Moving forward: cards slide left
-                      if (isLeft) return -900; // Coming from far left
-                      if (isCenter) return 900; // Coming from right (was right card)
-                      return 900; // Coming from right
-                    } else if (direction === -1) {
-                      // Moving backward: cards slide right
-                      if (isLeft) return 0; // Coming from center (was center card)
-                      if (isCenter) return -900; // Coming from left (was left card)
-                      return 900; // Staying on right
-                    } else {
-                      // Initial load
-                      if (isLeft) return -900;
-                      if (isCenter) return 0;
-                      return 900;
-                    }
-                  };
+                  if (!shouldShow && testimonials.length > 3) return null;
 
                   return (
                     <motion.div
-                      key={`${testimonial._id}-${currentIndex}-${position}`}
-                      initial={{
-                        x: getInitialX(),
-                        scale: isCenter ? 1 : 0.75,
-                        opacity: isCenter ? 1 : 0.4,
+                      key={testimonial._id}
+                      className="flex-shrink-0 w-full md:w-1/3 px-2"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ 
+                        opacity: isCurrent ? 1 : 0.7,
+                        scale: isCurrent ? 1 : 0.95
                       }}
-                      animate={{
-                        x: getXPosition(),
-                        scale: isCenter ? 1 : 0.75,
-                        opacity: isCenter ? 1 : 0.6,
-                        zIndex: isCenter ? 10 : isLeft ? 5 : 5,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 280,
-                        damping: 28,
-                        mass: 0.6
-                      }}
-                      className={`absolute ${
-                        isCenter 
-                          ? 'w-full max-w-4xl' 
-                          : 'w-full max-w-3xl'
-                      }`}
-                      style={{
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                      }}
+                      transition={{ duration: 0.3 }}
                     >
                       <div className={`
-                        bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8
+                        bg-dark-lighter/50 backdrop-blur-md border rounded-2xl p-6 md:p-8 h-full
                         transition-all duration-300
-                        ${isCenter 
+                        ${isCurrent 
                           ? 'border-primary/30 shadow-lg shadow-primary/10' 
-                          : 'border-text-primary/10 hover:border-text-primary/20'
+                          : 'border-text-primary/10'
                         }
                       `}>
                         {/* Stars */}
-                        <div className="flex gap-1 mb-4 justify-center">
+                        <div className="flex gap-1 mb-4">
                           {[...Array(testimonial.rating || 5)].map((_, i) => (
                             <FiStar 
                               key={i} 
-                              className={`text-yellow-400 fill-yellow-400 ${
-                                isCenter ? 'w-6 h-6' : 'w-4 h-4'
-                              }`} 
+                              className="text-yellow-400 fill-yellow-400 w-5 h-5" 
                             />
                           ))}
                         </div>
 
                         {/* Content */}
-                        <p className={`
-                          text-text-primary/90 mb-6 leading-relaxed text-center italic
-                          ${isCenter ? 'text-base md:text-lg' : 'text-sm md:text-base'}
-                        `}>
+                        <p className="text-text-primary/90 mb-6 leading-relaxed text-sm md:text-base">
                           &quot;{testimonial.quote}&quot;
                         </p>
 
                         {/* Author */}
-                        <div className="flex items-center gap-4 justify-center">
+                        <div className="flex items-center gap-4">
                           {imageUrl && (
-                            <div className={`
-                              rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0
-                              ${isCenter ? 'w-16 h-16' : 'w-12 h-12'}
-                            `}>
+                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
                               <Image
                                 src={imageUrl}
                                 alt={testimonial.name}
-                                width={isCenter ? 64 : 48}
-                                height={isCenter ? 64 : 48}
+                                width={48}
+                                height={48}
                                 className="w-full h-full object-cover"
                               />
                             </div>
                           )}
-                          <div className="text-center">
-                            <div className={`
-                              font-semibold text-text-primary mb-1
-                              ${isCenter ? 'text-lg' : 'text-base'}
-                            `}>
+                          <div>
+                            <div className="font-semibold text-text-primary text-base">
                               {testimonial.name}
                             </div>
                             {testimonial.role && (
-                              <div className={`
-                                text-text-primary/60 mb-1
-                                ${isCenter ? 'text-sm' : 'text-xs'}
-                              `}>
+                              <div className="text-sm text-text-primary/60">
                                 {testimonial.role}
                               </div>
                             )}
                             {testimonial.niche && (
-                              <div className={`
-                                text-primary font-medium
-                                ${isCenter ? 'text-xs' : 'text-xs opacity-80'}
-                              `}>
+                              <div className="text-xs text-primary font-medium mt-1">
                                 {testimonial.niche}
                               </div>
                             )}
@@ -292,7 +246,8 @@ const TestimonialsSection: React.FC = () => {
                     </motion.div>
                   );
                 })}
-              </div>
+              </motion.div>
+            </div>
 
               {/* Navigation Arrows */}
               {testimonials.length > 1 && (
