@@ -138,7 +138,7 @@ const TestimonialsSection: React.FC = () => {
               <motion.div
                 className="flex gap-6"
                 animate={{
-                  x: `calc(-${currentIndex * (100 / 3)}% - ${currentIndex * 1.5}rem)`
+                  x: currentIndex === 0 ? 0 : `-${currentIndex * (100 / 3)}%`
                 }}
                 transition={{
                   type: "spring",
@@ -148,7 +148,7 @@ const TestimonialsSection: React.FC = () => {
                 }}
                 drag="x"
                 dragConstraints={{ 
-                  left: `calc(-${(testimonials.length - 3) * (100 / 3)}% - ${(testimonials.length - 3) * 1.5}rem)`,
+                  left: testimonials.length <= 3 ? 0 : `-${Math.max(0, testimonials.length - 3) * (100 / 3)}%`,
                   right: 0
                 }}
                 dragElastic={0.2}
@@ -177,7 +177,8 @@ const TestimonialsSection: React.FC = () => {
                   return (
                     <motion.div
                       key={testimonial._id}
-                      className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]"
+                      className="flex-shrink-0 w-full md:w-1/3"
+                      style={{ width: 'calc(33.333% - 1rem)' }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
