@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
 
@@ -56,6 +56,10 @@ export default function LiquidEther({
   const resizeRafRef = useRef<number | null>(null);
   const [hasError, setHasError] = useState(false);
 
+  // Memoize colors to prevent infinite loops - compare by value, not reference
+  const colorsString = useMemo(() => JSON.stringify(colors), [JSON.stringify(colors)]);
+  const colorsArray = useMemo(() => colors, [colorsString]);
+
   // Check if WebGL is supported
   const checkWebGLSupport = () => {
     if (typeof window === 'undefined') return false;
@@ -109,7 +113,7 @@ export default function LiquidEther({
       return tex;
     };
 
-    const paletteTex = makePaletteTexture(colors);
+    const paletteTex = makePaletteTexture(colorsArray);
     const bgVec4 = new THREE.Vector4(0, 0, 0, 0); // always transparent
 
     class CommonClass {
@@ -1177,7 +1181,7 @@ export default function LiquidEther({
     mouseForce,
     resolution,
     viscous,
-    colors,
+    colorsString,
     autoDemo,
     autoSpeed,
     autoIntensity,
