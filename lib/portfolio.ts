@@ -9,7 +9,10 @@ export async function getPortfolioItems() {
       format,
       videoType,
       youtubeUrl,
-      "category": category->title,
+      categories[]->{
+        _id,
+        title
+      },
       thumbnail,
       tags,
       videoFile {

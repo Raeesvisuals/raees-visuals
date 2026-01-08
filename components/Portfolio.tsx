@@ -7,7 +7,7 @@ import Image from "next/image";
 import { FaPlay } from "react-icons/fa";
 import VideoModal from "./VideoModal";
 import { getPortfolioItems } from "@/lib/portfolio";
-import { urlFor } from "@/lib/sanity";
+import { sanityClient, urlFor } from "@/lib/sanity";
 
 interface PortfolioProps {
   isHomepage?: boolean;
@@ -30,6 +30,7 @@ const getYouTubeId = (url: string): string | null => {
 export default function Portfolio({ isHomepage = false }: PortfolioProps) {
   // ✅ ALWAYS ARRAY — NEVER UNDEFINED
   const [items, setItems] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
   const [activeCategory, setActiveCategory] = useState("All");
 
   const [selectedVideo, setSelectedVideo] = useState<{
@@ -43,29 +44,36 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
      FETCH DATA
   ========================= */
   useEffect(() => {
-    getPortfolioItems()
-      .then((data) => setItems(Array.isArray(data) ? data : []))
-      .catch(() => setItems([]));
-  }, []);
+    async function fetchData() {
+      try {
+        // Fetch portfolio items
+        const data = await getPortfolioItems();
+        setItems(Array.isArray(data) ? data : []);
 
-  /* =========================
-     CATEGORIES (SAFE)
-  ========================= */
-  const categories = [
-    "All",
-    ...Array.from(
-      new Set(
-        items
-          .map((i) => i?.category)
-          .filter(Boolean)
-      )
-    ),
-  ];
+        // Fetch all portfolio categories from Sanity
+        const categoriesResult = await sanityClient.fetch<Array<{ title: string }>>(
+          `*[_type == "category"] | order(title asc) {
+            title
+          }`
+        );
+        const categoryTitles = categoriesResult?.map((c) => c.title).filter(Boolean) || [];
+        setCategories(["All", ...categoryTitles]);
+      } catch (error) {
+        console.error("Error fetching portfolio data:", error);
+        setItems([]);
+        setCategories(["All"]);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const filtered =
     activeCategory === "All"
       ? items
-      : items.filter((i) => i.category === activeCategory);
+      : items.filter((i) => 
+          (i?.categories || []).some((cat: any) => cat?.title === activeCategory)
+        );
 
   const displayed = isHomepage ? filtered.slice(0, 8) : filtered;
 
@@ -191,7 +199,10 @@ export default function Portfolio({ isHomepage = false }: PortfolioProps) {
                           {item.title}
                         </h3>
                         <p className="text-xs text-text-primary/60 truncate">
-                          {item.category}
+                          {(item.categories || [])
+                            .map((cat: any) => cat?.title)
+                            .filter(Boolean)
+                            .join(", ")}
                         </p>
                       </div>
                     </div>
