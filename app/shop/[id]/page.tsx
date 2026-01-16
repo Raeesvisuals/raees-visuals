@@ -34,7 +34,8 @@ type Product = {
   slug: { current: string };
   title: string;
   description: string;
-  category: Category | null;
+  categories?: Category[] | null;
+  category?: Category | null; // Backward compatibility
   tags?: string[];
   price: number;
   originalPrice?: number;
@@ -94,6 +95,27 @@ export default function ProductPage() {
     isYouTube: false,
   });
 
+  const getYouTubeId = (url: string): string | null => {
+    try {
+      if (url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
+      if (url.includes("shorts/")) return url.split("shorts/")[1].split("?")[0];
+      if (url.includes("embed/")) return url.split("embed/")[1].split("?")[0];
+      return new URL(url).searchParams.get("v");
+    } catch {
+      return null;
+    }
+  };
+
+  const getPreviewVideoUrl = (productData: Product): string | null => {
+    if (productData.previewVideo?.youtubeUrl) return productData.previewVideo.youtubeUrl;
+    if (productData.previewVideo?.videoFile?.asset?.url) return productData.previewVideo.videoFile.asset.url;
+    return null;
+  };
+
+  const isYouTubeUrl = (url: string): boolean => {
+    return url.includes("youtube.com") || url.includes("youtu.be");
+  };
+
   /* ================= DATA FETCH ================= */
 
   useEffect(() => {
@@ -106,6 +128,11 @@ export default function ProductPage() {
             slug,
             title,
             description,
+            categories[]->{
+              _id,
+              title,
+              slug
+            },
             category->{
               _id,
               title,
@@ -136,13 +163,20 @@ export default function ProductPage() {
 
         setProduct(result);
 
-        if (result.category?._id) {
+        const relatedCategoryId =
+          result.categories?.[0]?._id || result.category?._id || null;
+
+        if (relatedCategoryId) {
           const related = await sanityClient.fetch<Product[]>(
             `*[_type == "product" && references($categoryId) && slug.current != $slug][0...3]{
               _id,
               slug,
               title,
               price,
+              categories[]->{
+                _id,
+                title
+              },
               category->{
                 _id,
                 title
@@ -150,7 +184,7 @@ export default function ProductPage() {
               thumbnail
             }`,
             {
-              categoryId: result.category._id,
+              categoryId: relatedCategoryId,
               slug,
             }
           );
@@ -199,15 +233,44 @@ export default function ProductPage() {
                   className="object-cover"
                 />
               )}
+
+              {getPreviewVideoUrl(product) && (
+                <button
+                  onClick={() => {
+                    const videoUrl = getPreviewVideoUrl(product);
+                    if (!videoUrl) return;
+                    const youtube = isYouTubeUrl(videoUrl);
+                    setVideoModal({
+                      isOpen: true,
+                      videoSrc: videoUrl,
+                      isYouTube: youtube,
+                      youtubeId: youtube ? getYouTubeId(videoUrl) || undefined : undefined,
+                    });
+                  }}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
+                  aria-label="Play preview video"
+                >
+                  <FaPlay className="text-white text-3xl" />
+                </button>
+              )}
             </div>
           </ElectricBorder>
 
           {/* INFO */}
           <div className="space-y-6">
-            {product.category && (
-              <span className="inline-block px-3 py-1 bg-primary/20 rounded-full text-primary">
-                {product.category.title}
-              </span>
+            {(product.categories?.length || product.category) && (
+              <div className="flex flex-wrap gap-2">
+                {(product.categories?.length ? product.categories : product.category ? [product.category] : []).map(
+                  (cat) => (
+                    <span
+                      key={cat._id}
+                      className="inline-block px-3 py-1 bg-primary/20 rounded-full text-primary text-sm"
+                    >
+                      {cat.title}
+                    </span>
+                  )
+                )}
+              </div>
             )}
 
             <h1 className="text-4xl font-bold text-text-primary">{product.title}</h1>
