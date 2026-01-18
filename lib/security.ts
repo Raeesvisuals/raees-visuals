@@ -19,13 +19,13 @@ export const securityHeaders = {
 export const getCSPHeader = (nonce: string) => ({
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.clerk.com https://clerk.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.clerk.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob:",
+    "img-src 'self' data: https: blob: https://*.clerk.com https://*.clerk.accounts",
     "media-src 'self' https: blob:",
-    "connect-src 'self' https: wss:",
-    "frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be",
+    "connect-src 'self' https: wss: https://*.clerk.com https://*.clerk.accounts",
+    "frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://*.clerk.com https://*.clerk.accounts",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
