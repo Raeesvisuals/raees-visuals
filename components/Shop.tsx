@@ -332,19 +332,6 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <div className="flex justify-end mb-6">
-            <Link href="/account">
-              <motion.button
-                className="flex items-center gap-2 px-4 py-2 bg-dark-lighter/50 backdrop-blur-md border border-text-primary/20 rounded-lg text-text-primary hover:border-primary/50 hover:text-primary transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaUser />
-                My Account
-              </motion.button>
-            </Link>
-          </div>
-          
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             Shop <span className="text-primary glow-text">Templates & LUTs</span>
           </h2>
