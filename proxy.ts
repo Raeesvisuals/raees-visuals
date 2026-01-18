@@ -8,7 +8,10 @@ export default clerkMiddleware(async (auth, request) => {
   const { pathname } = request.nextUrl;
 
   if (isProtectedRoute(request)) {
-    await auth().protect();
+    const authState = await auth();
+    if (!authState.userId) {
+      return authState.redirectToSignIn();
+    }
   }
 
   if (pathname.startsWith("/secure-admin") && pathname !== "/secure-admin/login") {
