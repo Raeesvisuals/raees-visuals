@@ -42,11 +42,13 @@ export async function downloadProduct(
     if (!response.ok) {
       // Try to parse error as JSON, but handle HTML error pages
       let errorMessage = "Failed to generate download URL";
+      let errorDetails: string | null = null;
       try {
         const contentType = response.headers.get("content-type");
         if (contentType?.includes("application/json")) {
           const error = await response.json();
           errorMessage = error.error || errorMessage;
+          errorDetails = error.details || null;
         } else {
           // If it's HTML (error page), get status text
           errorMessage = `${response.status}: ${response.statusText}`;
@@ -54,7 +56,11 @@ export async function downloadProduct(
       } catch (e) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
-      throw new Error(errorMessage);
+      const downloadError: any = new Error(errorMessage);
+      if (errorDetails) {
+        downloadError.details = errorDetails;
+      }
+      throw downloadError;
     }
 
     const { downloadUrl, expiresIn, fileName: apiFileName } = await response.json();
@@ -117,7 +123,7 @@ export async function downloadProductWithProgress(
     if (!response.ok) {
       // Try to parse error as JSON, but handle HTML error pages
       let errorMessage = "Failed to generate download URL";
-      let errorDetails = null;
+      let errorDetails: string | null = null;
       try {
         const contentType = response.headers.get("content-type");
         if (contentType?.includes("application/json")) {
