@@ -127,44 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Generate signed URL
     const expiresIn = 600; // 10 minutes
-    let downloadUrl: string;
-    
-    try {
-      downloadUrl = await generateDownloadUrl(filePath, expiresIn);
-    } catch (error: any) {
-      console.error("Failed to generate download URL:", error);
-      
-      // If R2 is not configured, provide helpful error message
-      if (error.message?.includes("R2") || error.message?.includes("environment variable")) {
-        return NextResponse.json(
-          { 
-            error: "Download service is not configured. Please configure R2 storage.",
-            details: "R2 environment variables are missing. Contact administrator."
-          },
-          { status: 503 }
-        );
-      }
-      
-      // If file not found, provide specific error
-      if (error.message?.includes("not found") || error.message?.includes("File not found")) {
-        return NextResponse.json(
-          { 
-            error: "Download file not found",
-            details: `The file "${filePath}" does not exist in storage.`
-          },
-          { status: 404 }
-        );
-      }
-      
-      // Generic error
-      return NextResponse.json(
-        { 
-          error: "Failed to generate download URL",
-          details: error.message || "Unknown error occurred"
-        },
-        { status: 500 }
-      );
-    }
+    const downloadUrl = await generateDownloadUrl(filePath, expiresIn);
 
     // Increment download count asynchronously
     Promise.resolve().then(async () => {
@@ -186,15 +149,28 @@ export async function POST(request: NextRequest) {
         product.downloadFile.fileName || filePath.split("/").pop(),
     });
   } catch (error: any) {
+    const message = error?.message || "Failed to generate download URL";
+    const isConfigError =
+      message.includes("R2 configuration error") ||
+      message.includes("Missing required R2") ||
+      message.includes("R2_ENDPOINT") ||
+      message.includes("R2_BUCKET_NAME") ||
+      message.includes("R2_ACCESS_KEY_ID") ||
+      message.includes("R2_SECRET_ACCESS_KEY");
+    const isNotFound = message.includes("File not found");
+
     console.error("POST /api/download error:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message,
+      stack: error?.stack,
+      name: error?.name,
     });
 
     return NextResponse.json(
-      { error: "Failed to generate download URL" },
-      { status: 500 }
+      {
+        error: "Failed to generate download URL",
+        details: message,
+      },
+      { status: isNotFound ? 404 : 500 }
     );
   }
 }
