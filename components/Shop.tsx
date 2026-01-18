@@ -12,6 +12,7 @@ import VideoModal from "./VideoModal";
 import { isProductPurchased, addPurchase } from "@/data/user";
 import { calculateIsNew } from "@/lib/fileMetadata";
 import { FaPlay, FaDownload, FaStar, FaTag, FaShoppingCart, FaUser, FaGift, FaSearch } from "react-icons/fa";
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 type Product = {
@@ -339,6 +340,30 @@ const Shop: React.FC<ShopProps> = ({ isHomepage = false }) => {
             High-quality video assets to elevate your projects. Professional templates, 
             cinematic LUTs, and motion graphics to bring your vision to life.
           </p>
+
+          {/* Account CTA (for new visitors) */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <SignedOut>
+              <SignInButton>
+                <button className="px-4 py-2 rounded-full border border-white/20 text-text-primary/80 hover:text-primary hover:border-primary/60 transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button className="px-4 py-2 rounded-full bg-primary text-dark hover:bg-primary/90 transition-colors">
+                  Create Account
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                href="/account"
+                className="px-4 py-2 rounded-full border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+              >
+                Go to My Account
+              </Link>
+            </SignedIn>
+          </div>
         </motion.div>
 
         {/* Filters and Controls */}
