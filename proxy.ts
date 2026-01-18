@@ -4,11 +4,11 @@ import { securityMiddleware, logSecurityEvent } from "./lib/security";
 
 const isProtectedRoute = createRouteMatcher(["/account(.*)"]);
 
-export default clerkMiddleware((auth, request) => {
+export default clerkMiddleware(async (auth, request) => {
   const { pathname } = request.nextUrl;
 
   if (isProtectedRoute(request)) {
-    auth().protect();
+    await auth().protect();
   }
 
   if (pathname.startsWith("/secure-admin") && pathname !== "/secure-admin/login") {
