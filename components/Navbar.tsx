@@ -5,7 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import GooeyNav from "./GooeyNav";
-import { SignedIn, SignedOut, SignOutButton, useUser } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  SignOutButton,
+  useUser,
+} from "@clerk/nextjs";
 
 
 const navItems = [
@@ -69,12 +77,18 @@ const Navbar: React.FC = () => {
             {/* Account Menu */}
             <div className="relative">
               <SignedOut>
-                <Link
-                  href="/sign-in"
-                  className="px-4 py-2 rounded-full border border-white/20 text-text-primary/80 hover:text-primary hover:border-primary/60 transition-colors"
-                >
-                  Sign In
-                </Link>
+                <div className="flex items-center gap-3">
+                  <SignInButton>
+                    <button className="px-4 py-2 rounded-full border border-white/20 text-text-primary/80 hover:text-primary hover:border-primary/60 transition-colors">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                  <SignUpButton>
+                    <button className="px-4 py-2 rounded-full bg-primary text-dark hover:bg-primary/90 transition-colors">
+                      Create Account
+                    </button>
+                  </SignUpButton>
+                </div>
               </SignedOut>
               <SignedIn>
                 <button
@@ -92,9 +106,14 @@ const Navbar: React.FC = () => {
                     onMouseLeave={() => setIsAccountOpen(false)}
                   >
                     <div className="px-4 py-3 border-b border-text-primary/10">
-                      <div className="text-sm text-text-primary/60">Account</div>
-                      <div className="text-text-primary font-semibold">
-                        {user?.fullName || "My Account"}
+                      <div className="flex items-center gap-3">
+                        <UserButton />
+                        <div>
+                          <div className="text-sm text-text-primary/60">Account</div>
+                          <div className="text-text-primary font-semibold">
+                            {user?.fullName || "My Account"}
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="py-2">
