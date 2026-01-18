@@ -20,7 +20,7 @@ const accountMenuItems = [
   { label: "My Projects", href: "/account/projects" },
   { label: "My Collections", href: "/account/collections" },
   { label: "My Downloads", href: "/account/downloads" },
-  { label: "My Account", href: "/account" },
+  { label: "My Account", href: "/account/profile" },
   { label: "Help Center", href: "/help-center" },
   { label: "Sign Out", href: "/account/sign-out" },
 ];
