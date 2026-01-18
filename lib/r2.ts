@@ -122,14 +122,35 @@ export async function generateDownloadUrl(
 
     return signedUrl;
   } catch (error: any) {
-    if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+    const statusCode = error?.$metadata?.httpStatusCode;
+    const errorName = error?.name || "UnknownError";
+    const errorCode = error?.Code || error?.code;
+    const requestId = error?.$metadata?.requestId;
+
+    if (errorName === "NotFound" || statusCode === 404) {
       throw new Error(`File not found: ${filePath}`);
+    }
+    if (statusCode === 403) {
+      throw new Error(
+        `R2 access denied (403). Check R2 API token permissions for bucket "${getR2BucketName()}".`
+      );
     }
     // Check for configuration errors
     if (error.message?.includes("environment variable") || error.message?.includes("R2_")) {
       throw new Error(`R2 configuration error: ${error.message}`);
     }
-    throw new Error(`Failed to generate download URL: ${error.message}`);
+    const detailParts = [
+      `name=${errorName}`,
+      errorCode ? `code=${errorCode}` : null,
+      statusCode ? `status=${statusCode}` : null,
+      requestId ? `requestId=${requestId}` : null,
+    ].filter(Boolean);
+
+    throw new Error(
+      `Failed to generate download URL: ${error.message || errorName}${
+        detailParts.length ? ` (${detailParts.join(", ")})` : ""
+      }`
+    );
   }
 }
 
