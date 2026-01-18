@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 const accountNavItems = [
   { label: "Dashboard", href: "/account" },
@@ -65,7 +66,33 @@ export default function AccountShell({ title, subtitle, children }: AccountShell
           </aside>
 
           {/* Main */}
-          <main className="space-y-6">{children}</main>
+          <main className="space-y-6">
+            <SignedOut>
+              <div className="bg-dark-lighter/60 border border-text-primary/10 rounded-2xl p-8">
+                <h2 className="text-2xl font-bold text-text-primary mb-2">
+                  Sign in to access your account
+                </h2>
+                <p className="text-text-primary/70 mb-6">
+                  Create a free account to manage your downloads, projects, and collections.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/sign-in"
+                    className="px-5 py-3 rounded-lg bg-primary text-dark font-semibold"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="px-5 py-3 rounded-lg border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    Create Account
+                  </Link>
+                </div>
+              </div>
+            </SignedOut>
+            <SignedIn>{children}</SignedIn>
+          </main>
         </div>
       </div>
     </div>
