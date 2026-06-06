@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import PageTransition from "./PageTransition";
@@ -10,7 +11,18 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+const STANDALONE_ROUTES = ["/fitness"];
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const pathname = usePathname();
+  const isStandalone = STANDALONE_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  if (isStandalone) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <CursorTrail />
